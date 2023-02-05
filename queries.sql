@@ -359,7 +359,16 @@ select user.name, user.phone_num, max(userhistory.date)
 from user,userhistory
 where user.user_id = userhistory.user_id
 and userhistory.action = 'logged_on'
-and userhistory.        q       date >= date_sub(curdate(), interval 30 day)
+and userhistory.date >= date_sub(curdate(), interval 30 day)
+group by user.name;
+
+-- another way
+select user.name, max(userhistory.date)
+from user
+join userhistory
+on user.user_id = userhistory.user_id
+and userhistory.action = 'logged_on'
+and userhistory.date >= date_sub(curdate(), interval 30 day)
 group by user.name;
 
 -- 47> Given two tables:  User(user_id, name, phone_num) and UserHistory(user_id, date, action), 
