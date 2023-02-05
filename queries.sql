@@ -295,11 +295,22 @@ having sum(number_of_interactions) >= 4;
 -- 43> write a sql query to find the names of all salesperson that have order with samsonic from 
 -- the table: salesperson, customer, orders
 
+-- 1st way
 select s.name
 from salesperson s
 join orders o on s.id = o.salesperson_id
 join customer c on o.cust_id = c.id
 where c.name = 'Samsonic';
+
+-- 2nd way
+select s.name 
+from salesperson s 
+where s.id IN (
+  select o.salesperson_id 
+  from orders o, customer c 
+  where c.id=o.cust_id and c.name='Samsonic'
+);
+
 
 -- 44> write a sql query to find the names of all salesperson that do not have any order with Samsonic from the table: salesperson, customer, orders
 
@@ -317,6 +328,28 @@ join orders o on s.id = o.salesperson_id
 group by s.name
 having count(o.number)>=2;
 
+select id, name 
+from salesperson s
+where exists
+ (
+  select o.salesperson_id, count(o.number) as count 
+  from orders o 
+  where o.salesperson_id=s.id
+  group by o.salesperson_id
+  having count(o.number)>=2
+);
+
+
+select s.name
+from salesperson s 
+where s.id IN (
+  select o.salesperson_id
+  from orders o
+  group by o.salesperson_id 
+  having count(o.number)>=2 
+);
+
+
 -- 46> Given two tables:  User(user_id, name, phone_num) and UserHistory(user_id, date, action), 
 -- write a sql query that returns the name, phone number and most recent date for any user that has logged in 
 -- over the last 30 days 
@@ -326,7 +359,7 @@ select user.name, user.phone_num, max(userhistory.date)
 from user,userhistory
 where user.user_id = userhistory.user_id
 and userhistory.action = 'logged_on'
-and userhistory.date >= date_sub(curdate(), interval 30 day)
+and userhistory.        q       date >= date_sub(curdate(), interval 30 day)
 group by user.name;
 
 -- 47> Given two tables:  User(user_id, name, phone_num) and UserHistory(user_id, date, action), 
