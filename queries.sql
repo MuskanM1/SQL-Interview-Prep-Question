@@ -30,7 +30,7 @@ on e1.employee_id = e2.manager_id;
 -- 7> Write a SQL query to find all employees who have bonus record in bonus table
 select * from employee;
 select * from bonus;
-
+ 
 select * from employee where employee_id in (select employee_ref_id from bonus where employee.employee_id = bonus.employee_ref_id);
 
 -- 8> Write a SQL query to find only odd rows from employee table
