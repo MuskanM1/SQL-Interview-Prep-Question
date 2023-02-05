@@ -192,7 +192,7 @@ select date, user_id, avg(timespend_sec)
 from event_session_details
 group by 1,2
 order by 1;
-
+ 
 -- 34> write a SQL query to find top 10 users that sent the most messages from messages_detail table.
 select * from messages_detail;
 
