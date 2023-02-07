@@ -248,6 +248,14 @@ from messages_detail
 order by messages_sent desc
 limit 10;
 
+-- another way
+select user_id, messages_sent
+from messages_detail a
+where 10 >= (
+  select count(*) from messages_detail b 
+  where b.messages_sent>=a.messages_sent
+)
+
 -- 35> Write a SQL query to find disctinct first name from full user name from usere_name table
 select * from user_name;
 
@@ -263,6 +271,21 @@ select app_id
         / sum(case when type = 'impression' then 1 else 0 end), 0 )AS 'CTR(click through rate)'
 from dialoglog
 group by app_id;
+
+
+-- another way
+SELECT impressions_clicks_table.app_id,
+       ifnull((impressions_clicks_table.clicks * 100 / impressions_clicks_table.impressions),0) AS CTR
+FROM
+  (
+  SELECT app_id,
+         SUM(CASE when type='impression' THEN 1 ELSE 0 END) impressions,
+         SUM(CASE when type='click' THEN 1 ELSE 0 END) clicks
+  FROM dialoglog 
+  GROUP BY app_id
+  ) AS impressions_clicks_table
+ORDER BY impressions_clicks_table.app_id;
+
 
 -- 37> Given two tables Friend_request (requestor_id, sent_to_id, time),  
 -- Request_accepted (acceptor_id, requestor_id, time). Find the overall acceptance rate of requests.
@@ -289,6 +312,24 @@ select acceptor_id as id from new_request_accepted) as a
 group by 1
 order by count desc
 limit 1) as table1;
+
+
+
+-- another way
+with all_request_ids AS (
+  select requestor_id as id from new_request_accepted
+  union all
+  select acceptor_id as id from new_request_accepted
+),
+friends_count AS (
+  select id, count(*) as num 
+  from all_request_ids
+  group by id 
+  order by num desc limit 1
+)
+select id from friends_count;
+
+
 
 -- 39> from the table count_request, find total count of requests sent and total count of requests sent failed 
 -- per country
