@@ -157,6 +157,53 @@ on a.user_id = c.follower_id
 where a.active_last_month =1
 group by b.sport_category;
 
+
+-- Different ways
+-- 1st way
+select b.sport_category, count(distinct CONCAT(c.follower_id,c.target_id))
+from sport_accounts b
+join all_users a
+join follow_relation c
+on a.user_id = c.follower_id and a.active_last_month=1
+on c.target_id = b.sport_player_id
+group by b.sport_category;
+
+-- 2nd way
+select b.sport_category, count(distinct CONCAT(c.follower_id,c.target_id))
+from sport_accounts b
+join (all_users a
+join follow_relation c
+on a.user_id = c.follower_id and a.active_last_month=1)
+on c.target_id = b.sport_player_id
+group by b.sport_category;
+
+
+-- Building 3rd way
+select b.sport_category, c.target_id, c.follower_id
+from sport_accounts b
+join follow_relation c
+on b.sport_player_id = c.target_id and c.follower_id IN (
+select user_id from all_users where active_last_month=1);
+
+-- Building 3rd way
+select b.sport_category, count(c.follower_id)
+from sport_accounts b
+join follow_relation c
+on b.sport_player_id = c.target_id and c.follower_id IN (
+select user_id from all_users where active_last_month=1)
+group by b.sport_category;
+
+-- 3rd way
+select b.sport_category, count(distinct CONCAT(c.target_id,c.follower_id))
+from sport_accounts b
+join follow_relation c
+on b.sport_player_id = c.target_id and c.follower_id IN (
+select user_id from all_users where active_last_month=1)
+group by b.sport_category;
+
+
+
+
 -- 31> What percent of active accounts are fraud from ad_accounts table?
 select * from ad_accounts;
 
